@@ -324,5 +324,8 @@
 
     updateAllView();
   </script>
+  <div class="nav-brand">
+        <a href="/"><img src="https://homepage.internal.leahycenter.org/img/leahyCenter.png" alt="lcdi logo" id="logo" style="height: 48px;"></a>
+    </div>
 </body>
 </html>
