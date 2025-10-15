@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dynamic Folder Tabs with Counters</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .folder-bar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: #f1f1f1;
+      border-bottom: 2px solid #ccc;
+      display: flex;
+      padding: 0 10px;
+      z-index: 1000;
+    }
+
+    .folder-tab {
+      background-color: #e0e0e0;
+      padding: 10px 20px;
+      margin: 10px 5px 0 0;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .folder-tab:hover {
+      background-color: #d5d5d5;
+    }
+
+    .folder-tab.active {
+      background-color: white;
+      font-weight: bold;
+      border-bottom: 2px solid white;
+    }
+
+    .content {
+      padding: 80px 20px 20px;
+    }
+
+    .folder-content, .nested-content {
+      display: none;
+    }
+
+    .folder-content.active, .nested-content.active {
+      display: block;
+    }
+
+    .nested-bar {
+      margin-top: 10px;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .nested-tab {
+      background-color: #ddd;
+      padding: 6px 15px;
+      border: 1px solid #bbb;
+      border-radius: 3px 3px 0 0;
+      cursor: pointer;
+    }
+
+    .nested-tab:hover {
+      background-color: #ccc;
+    }
+
+    .nested-tab.active {
+      background-color: #fff;
+      font-weight: bold;
+      border-bottom: none;
+    }
+
+    .nested-content {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-top: none;
+      margin-bottom: 20px;
+    }
+
+    .counter {
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .counter input[type="number"] {
+      width: 80px;
+      padding: 5px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .counter button {
+      padding: 5px 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .add-item {
+      margin-top: 10px;
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .add-item:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="folder-bar">
+    <div class="folder-tab active" data-folder="Office Supplies">Office Supplies</div>
+    <div class="folder-tab" data-folder="Tech Equipment">Tech Equipment</div>
+    <div class="folder-tab" data-folder="Laptops">Laptops</div>
+  </div>
+
+  <div class="content">
+    <!-- Folder Containers -->
+    <div id="Office Supplies" class="folder-content active" data-folder-id="Office Supplies">
+      <div class="nested-bar"></div>
+      <button class="add-item">+ Add Item</button>
+    </div>
+    <div id="Tech Equipment" class="folder-content" data-folder-id="Tech Equipment">
+      <div class="nested-bar"></div>
+      <button class="add-item">+ Add Item</button>
+    </div>
+    <div id="Laptops" class="folder-content" data-folder-id="Laptops">
+      <div class="nested-bar"></div>
+      <button class="add-item">+ Add Item</button>
+    </div>
+  </div>
+
+  <script>
+        const lastActiveNestedTab = {};
+    // --- Folder Tab Switching ---
+    const topTabs = document.querySelectorAll('.folder-tab');
+    const topContents = document.querySelectorAll('.folder-content');
+
+   topTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetId = tab.getAttribute('data-folder');
+        topTabs.forEach(t => t.classList.remove('active'));
+        topContents.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        const folderContent = document.getElementById(targetId);
+        folderContent.classList.add('active');
+
+        const nestedTabs = folderContent.querySelectorAll('.nested-tab');
+        const nestedContents = folderContent.querySelectorAll('.nested-content');
+
+        // Determine which nested tab to activate
+        let activeNestedId = lastActiveNestedTab[targetId] || (nestedTabs[0] && nestedTabs[0].dataset.nested);
+
+        nestedTabs.forEach(t => t.classList.remove('active'));
+        nestedContents.forEach(c => c.classList.remove('active'));
+
+        if (activeNestedId) {
+          folderContent.querySelector(`.nested-tab[data-nested="${activeNestedId}"]`)?.classList.add('active');
+          folderContent.querySelector(`#${activeNestedId}`)?.classList.add('active');
+        }
+      });
+    });
+
+    // --- Counter Button Logic ---
+    function setupCounterLogic(container) {
+      const buttons = container.querySelectorAll('button[data-change]');
+      const input = container.querySelector('input[type="number"]');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const change = parseInt(btn.dataset.change, 10);
+          let current = parseInt(input.value || '0', 10);
+          const min = parseInt(input.min || '0', 10);
+          current = Math.max(current + change, min);
+          input.value = current;
+        });
+      });
+    }
+
+    // --- Nested Tab Switching ---
+    function setupNestedTabLogic(folderEl) {
+      const tabs = folderEl.querySelectorAll('.nested-tab');
+      const contents = folderEl.querySelectorAll('.nested-content');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
+
+          tab.classList.add('active');
+          folderEl.querySelector(`#${tab.dataset.nested}`).classList.add('active');
+
+          // Remember last active nested tab for this folder
+          const folderId = folderEl.getAttribute('data-folder-id');
+          lastActiveNestedTab[folderId] = tab.dataset.nested;
+        });
+      });
+    }
+    // --- Add Item Logic ---
+    const addButtons = document.querySelectorAll('.add-item');
+    let itemCount = 0;
+
+    addButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const folderContent = button.closest('.folder-content');
+        const folderId = folderContent.getAttribute('data-folder-id');
+        const nestedBar = folderContent.querySelector('.nested-bar');
+
+        const name = prompt('Enter item name:');
+        if (!name) return;
+
+        const tabId = `${folderId}-sf${++itemCount}`;
+
+        // Create new tab
+        const newTab = document.createElement('div');
+        newTab.className = 'nested-tab';
+        newTab.dataset.nested = tabId;
+        newTab.textContent = name;
+
+        // Create content area
+        const newContent = document.createElement('div');
+        newContent.className = 'nested-content';
+        newContent.id = tabId;
+        newContent.innerHTML = `
+          <h2>${folderId} → ${name}</h2>
+          <p>Content for ${name}.</p>
+          <div class="counter">
+            <label>Counter:</label>
+            <button data-change="-10">-10</button>
+            <button data-change="-1">-1</button>
+            <input type="number" value="0" min="0">
+            <button data-change="1">+1</button>
+            <button data-change="10">+10</button>
+          </div>
+        `;
+
+        folderContent.appendChild(newContent);
+        nestedBar.appendChild(newTab);
+
+        setupCounterLogic(newContent);
+        setupNestedTabLogic(folderContent);
+
+        // Activate new tab
+        const allTabs = folderContent.querySelectorAll('.nested-tab');
+        const allContents = folderContent.querySelectorAll('.nested-content');
+        allTabs.forEach(t => t.classList.remove('active'));
+        allContents.forEach(c => c.classList.remove('active'));
+
+        newTab.classList.add('active');
+        newContent.classList.add('active');
+        
+        //remember active Tabs
+        // Remember the new active tab
+        lastActiveNestedTab[folderId] = tabId;
+      });
+    });
+
+    // --- Init Default Tabs and Counters ---
+    document.querySelectorAll('.folder-content').forEach(folder => {
+      const content = document.createElement('div');
+      content.className = 'nested-content active';
+      content.id = defaultTabId;
+      content.innerHTML = `
+        <h2>${folder.id} /Keyboards</h2>
+        <p>item content.</p>
+        <div class="counter">
+          <label>Counter:</label>
+          <button data-change="-10">-10</button>
+          <button data-change="-1">-1</button>
+          <input type="number" value="0" min="0">
+          <button data-change="1">+1</button>
+          <button data-change="10">+10</button>
+        </div>
+      `;
+
+      nestedBar.appendChild(tab);
+      folder.appendChild(content);
+      setupCounterLogic(content);
+      setupNestedTabLogic(folder);
+    });
+  </script>
+
+</body>
+</html>
