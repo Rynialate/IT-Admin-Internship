@@ -2,11 +2,99 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Folder Tabs with Items, Counters & "All" View</title>
+  <title>Inventory Tabs with Items, Counters & All View</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
+    }
+    .search {
+        color: #666;
+        border-top: 0 none;
+        overflow: hidden;
+        margin: 0;
+        padding: 4px 6px 0 4px;
+        position: absolute;
+        top: 100px;
+        left:520px;
+        z-index: 99;
+        white-space: normal;
+    }
+    .search.left {
+        border-left: 0 none;
+        border-radius: 0px 0px 5px 0px;
+        left: 0;
+    }
+    .search.right {
+        border-radius: 0px 0px 0px 5px;
+        border-right: 0 none;
+        right: 0;
+    }
+    
+    .search_form {
+        margin: 0 20px 4px 0;
+        overflow: hidden;
+        line-height: 1.9;
+    }
+    .search_form.nomatch {
+        outline: 1px solid blue;
+    }
+    
+    .search_field {
+        border-radius: 3px 0 0 3px;
+        background-color: white;
+        color: black;
+        border: 1px solid #cbcbcb;
+        border-right: 0 none;
+        outline: 0;
+        padding: 0;
+        font-size: inherit;
+        margin: 0;
+        line-height: inherit;
+        padding: 0 6px;
+        min-width: 17em;
+        vertical-align: top;
+        min-height: 1.8em;
+        box-sizing: content-box;
+    }
+    .searchbtn {
+        border: 1px solid #cbcbcb;
+        line-height: inherit;
+        display: inline-block;
+        padding: 0 6px;
+        background: #fff;
+        border-right: 0 none;
+        border-left: 1px solid #dcdcdc;
+        cursor: pointer;
+        margin: 0;
+        position: relative;
+        color: #666;
+    }
+    .searchbtn:last-child {
+        border-radius: 0 3px 3px 0;
+        border-right: 1px solid #cbcbcb;
+    }
+    .searchbtn:disabled {
+        background: none;
+        cursor: default;
+    }
+    .searchbtn:hover {
+        background-color: #eef1f6;
+    }
+    .searchbtn.prev, .searchbtn.next {
+         padding: 0px 0.7em
+    }
+    .searchbtn.prev:after, .searchbtn.next:after {
+         content: "";
+         border: solid 2px #888;
+         width: 0.5em;
+         height: 0.5em;
+         border-width:  2px 0 0 2px;
+         display:inline-block;
+         transform: rotate(-45deg);
+    }
+    .searchbtn.next:after {
+         border-width: 0 2px 2px 0 ;
     }
     .folder-bar {
       position: fixed;
@@ -125,14 +213,20 @@
   </style>
 </head>
 <body>
-
+  <div class="search">
+     <div class="search_form nomatch">
+      <input class="search_field" placeholder="Search for" spellcheck="false">
+       <span action="findPrev" class="searchbtn prev"> </span>
+      <span action="findNext" class="searchbtn next"> </span>
+      <span class="ace_search_counter">13 of 513</span>
+     </div>
+  </div>
   <div class="folder-bar">
     <div class="folder-tab active" data-folder="OfficeSupplies">Office Supplies</div>
     <div class="folder-tab" data-folder="TechEquipment">Tech Equipment</div>
     <div class="folder-tab" data-folder="Laptops">Laptops</div>
     <div class="folder-tab" data-folder="folderAll">All</div>
   </div>
-
   <div class="content">
     <div id="OfficeSupplies" class="folder-content active" data-folder-id="OfficeSupplies">
       <div class="nested-bar"></div>
@@ -308,7 +402,7 @@
       });
     }
 
-    // Initialize each folder with 1 Item
+    // Initialize each folder
     document.querySelectorAll('.folder-content').forEach(folder => {
       const defaultTabId = `${folder.id}-default`;
       const nestedBar = folder.querySelector('.nested-bar');
