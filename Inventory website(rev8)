@@ -209,6 +209,16 @@
      font-family: monospace;
      white-space: pre;
     } 
+    #allItemsList {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    #allItemsList td {
+     padding: 6px 10px;
+     border-bottom: 1px solid #ccc;
+    }
     .nav-brand {
       margin-top: 65px;
       left: 5px;
@@ -404,22 +414,34 @@
     });
 
     function updateAllView() {
-      const list = document.getElementById('allItemsList');
-      list.innerHTML = '';
-      document.querySelectorAll('.folder-content').forEach(folder => {
-        const folderId = folder.getAttribute('data-folder-id');
-        if (folderId === 'folderAll') return;
-        const Items = folder.querySelectorAll('.nested-content');
-        Items.forEach(sub => {
-          const title = sub.querySelector('h2')?.textContent || 'Unnamed';
-          const input = sub.querySelector('input[type="number"]');
-          const value = input ? input.value : '0';
-          const entry = document.createElement('div');
-          entry.textContent = `${title.trim()}: ${value}`;
-          list.appendChild(entry);
-        });
-      });
-    }
+  const list = document.getElementById('allItemsList');
+  list.innerHTML = ''; // Clear old content
+
+  document.querySelectorAll('.folder-content').forEach(folder => {
+    const folderId = folder.getAttribute('data-folder-id');
+    if (folderId === 'folderAll') return;
+
+    const Items = folder.querySelectorAll('.nested-content');
+    Items.forEach(sub => {
+      const title = sub.querySelector('h2')?.textContent || 'Unnamed';
+      const input = sub.querySelector('input[type="number"]');
+      const value = input ? input.value.trim() : '0';
+
+      const row = document.createElement('tr');
+
+      const nameCell = document.createElement('td');
+      nameCell.textContent = title.trim();
+
+      const valueCell = document.createElement('td');
+      valueCell.textContent = value;
+      valueCell.style.textAlign = 'right';
+
+      row.appendChild(nameCell);
+      row.appendChild(valueCell);
+      list.appendChild(row);
+    });
+  });
+}
 
     // Initialize each folder
     document.querySelectorAll('.folder-content').forEach(folder => {
