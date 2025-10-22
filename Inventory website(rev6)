@@ -15,8 +15,8 @@
         margin: 0;
         padding: 4px 6px 0 4px;
         position: absolute;
-        top: 100px;
-        left:520px;
+        top: 51px;
+        right:50px;
         z-index: 99;
         white-space: normal;
     }
@@ -35,9 +35,8 @@
         margin: 0 20px 4px 0;
         overflow: hidden;
         line-height: 1.9;
-    }
-    .search_form.nomatch {
         outline: 1px solid blue;
+
     }
     
     .search_field {
@@ -210,11 +209,18 @@
      font-family: monospace;
      white-space: pre;
     } 
+    .nav-brand {
+      margin-top: 65px;
+      left: 5px;
+    }
   </style>
 </head>
 <body>
+    <div class="nav-brand">
+        <a href="/"><img src="https://homepage.internal.leahycenter.org/img/leahyCenter.png" alt="lcdi logo" id="logo" style="height: 48px;"></a>
+    </div>
   <div class="search">
-     <div class="search_form nomatch">
+     <div class="search_form">
       <input class="search_field" placeholder="Search for" spellcheck="false">
        <span action="findPrev" class="searchbtn prev"> </span>
       <span action="findNext" class="searchbtn next"> </span>
@@ -243,7 +249,6 @@
     <div id="folderAll" class="folder-content" data-folder-id="folderAll">
       <h2>All Items (Read-Only)</h2>
       <div class="readonly-list" id="allItemsList">
-        <!-- Auto-generated -->
       </div>
     </div>
   </div>
@@ -318,8 +323,10 @@
           const tab = folderEl.querySelector(`.nested-tab[data-nested="${tabId}"]`);
           const content = folderEl.querySelector(`#${tabId}`);
           const isActive = tab.classList.contains('active');
+          if (confirm() == true) {
           tab?.remove();
           content?.remove();
+          }
 
           if (isActive) {
             const tabs = folderEl.querySelectorAll('.nested-tab');
@@ -417,9 +424,8 @@
     });
 
     updateAllView();
+
   </script>
-  <div class="nav-brand">
-        <a href="/"><img src="https://homepage.internal.leahycenter.org/img/leahyCenter.png" alt="lcdi logo" id="logo" style="height: 48px;"></a>
-    </div>
+
 </body>
 </html>
