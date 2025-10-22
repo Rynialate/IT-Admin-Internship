@@ -323,7 +323,8 @@
           const tab = folderEl.querySelector(`.nested-tab[data-nested="${tabId}"]`);
           const content = folderEl.querySelector(`#${tabId}`);
           const isActive = tab.classList.contains('active');
-          if (confirm() == true) {
+          let text = "Delete Item?" ;
+          if (confirm(text) == true) {
           tab?.remove();
           content?.remove();
           }
@@ -354,12 +355,15 @@
         const name = prompt('Enter Item name:');
         if (!name) return;
         const tabId = `${folderId}-sf${++ItemCount}`;
-
+        
+       
+        
         const tab = document.createElement('div');
         tab.className = 'nested-tab';
         tab.dataset.nested = tabId;
         tab.textContent = name;
-
+     
+        
         const content = document.createElement('div');
         content.className = 'nested-content';
         content.id = tabId;
@@ -375,6 +379,14 @@
           </div>
           <button class="delete-Item" data-tab="${tabId}">Delete Item</button>
         `;
+        if (name.length > 32) {
+          window.alert("over 32 characters");
+          if (confirm(text) == true) {
+          tab?.remove();
+          content?.remove();
+          }
+
+        }
 
         nestedBar.appendChild(tab);
         folderContent.appendChild(content);
