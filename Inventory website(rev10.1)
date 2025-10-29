@@ -270,9 +270,19 @@
       <button class="add-folder">+ Add Item</button>
     </div>
     <div id="folderAll" class="folder-content" data-folder-id="folderAll">
-      <h2>All folders (Read-Only)</h2>
-      <div class="readonly-list" id="allfoldersList">
-      </div>
+  <h2>All folders (Read-Only)</h2>
+
+  <div style="margin-bottom:10px;">
+    <label for="importAllInput" class="add-folder" style="background:#ff9800; cursor:pointer;">
+       Import 
+      <input type="file" id="importAllInput" accept=".json" style="display:none;">
+    </label>
+      <button id="exportAllBtn" class="add-folder" style="background:#2196f3;"> Export </button>
+
+  </div>
+
+  <div class="readonly-list" id="allfoldersList"></div>
+</div>
     </div>
   </div>
 
@@ -474,7 +484,7 @@
       });
     });
   }
-
+  
   // Search
   let searchResults = [];
   let currentIndex = -1;
@@ -546,8 +556,122 @@
     highlightText(e.target.value);
   });
   // Search end
+ // import and export functions 
 
+  function getAllFolderData() {
+    const data = {};
+  
+    document.querySelectorAll('.folder-content').forEach(folder => {
+      const folderId = folder.getAttribute('data-folder-id');
+      if (folderId === 'folderAll') return;
+      const subfolders = [];
+  
+      folder.querySelectorAll('.nested-content').forEach(sub => {
+        const title = sub.querySelector('h2')?.textContent || 'Unnamed';
+        const input = sub.querySelector('input[type="number"]');
+        subfolders.push({
+          name: title.split('/').slice(1).join('/'),
+          count: input ? parseInt(input.value, 10) : 0
+        });
+      });
+  
+      data[folderId] = subfolders;
+    });
+  
+    return data;
+  }
+  function exportAllData(filename = 'inventory_export.json') {
+  const data = getAllFolderData();
+  if (!data) {
+    console.error('No data found to export');
+    return;
+  }
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+}
+  
+  function importAllData(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        restoreFolderData(data);
+        alert('Import successful');
+      } catch (err) {
+        alert('Invalid file format');
+      }
+    };
+    reader.readAsText(file);
+  }
+  
+  function restoreFolderData(data) {
+    Object.entries(data).forEach(([folderId, subfolders]) => {
+      const folder = document.querySelector(`.folder-content[data-folder-id="${folderId}"]`);
+      if (!folder) return;
+      const nestedBar = folder.querySelector('.nested-bar');
+  
+      // Clear current subfolders
+      nestedBar.innerHTML = '';
+      folder.querySelectorAll('.nested-content').forEach(c => c.remove());
+  
+      subfolders.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  
+      subfolders.forEach(sub => {
+        const tabId = `${folderId}-sf${++folderCount}`;
+  
+        const tab = document.createElement('div');
+        tab.className = 'nested-tab';
+        tab.dataset.nested = tabId;
+        tab.textContent = sub.name;
+  
+        const content = document.createElement('div');
+        content.className = 'nested-content';
+        content.id = tabId;
+        content.innerHTML = `
+          <h2>${folderId}/${sub.name}</h2>
+          <div class="counter">
+            <label>Counter:</label>
+            <button data-change="-10">-10</button>
+            <button data-change="-1">-1</button>
+            <input type="number" value="${sub.count}" min="0">
+            <button data-change="1">+1</button>
+            <button data-change="10">+10</button>
+          </div>
+          <button class="delete-folder" data-tab="${tabId}">Delete folder</button>
+        `;
+  
+        nestedBar.appendChild(tab);
+        folder.appendChild(content);
+  
+        setupCounterLogic(content);
+      });
+  
+      setupNestedTabLogic(folder);
+      setupDeleteButtons(folder);
+    });
+  
+    updateAllView();
+  }
+  
+  // Hook up event listeners
+  document.getElementById('exportAllBtn').addEventListener('click', exportAllData);
+  document.getElementById('importAllInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) importAllData(file);
+  });
+  // import/export end
   updateAllView();
+
 </script>
 
 </body>
