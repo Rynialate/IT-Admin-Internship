@@ -593,7 +593,7 @@
   
     return data;
   }
-  function exportAllData(filename = 'inventory_export.json') {
+  function exportAllData() {
   const data = getAllFolderData();
   if (!data) {
     console.error('No data found to export');
@@ -602,10 +602,11 @@
 
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-
   const a = document.createElement('a');
+  let date = new Date();
+  let d = date.toString().slice(0, 15);
   a.href = url;
-  a.download = filename;
+  a.download = ('Inventory ' + d) ;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
