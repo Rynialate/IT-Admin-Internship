@@ -224,7 +224,20 @@
      padding: 10px;
      font-family: monospace;
      white-space: pre;
-    } 
+    }
+    .all-btn {
+      margin-top: 10px;
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .all-btn:hover {
+      background-color: #45a049;
+    }
     #allfoldersList {
       width: 100%;
       border-collapse: collapse;
@@ -273,11 +286,11 @@
   <h2>All folders (Read-Only)</h2>
 
   <div style="margin-bottom:10px;">
-    <label for="importAllInput" class="add-folder" style="background:#ff9800; cursor:pointer;">
+    <label for="importAllInput" class="all-btn" style="background:#ff9800; cursor:pointer;">
        Import 
       <input type="file" id="importAllInput" accept=".json" style="display:none;">
     </label>
-      <button id="exportAllBtn" class="add-folder" style="background:#2196f3;"> Export </button>
+      <button id="exportAllBtn" class="all-btn" style="background:#2196f3;"> Export </button>
 
   </div>
 
