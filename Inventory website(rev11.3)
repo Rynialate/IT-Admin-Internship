@@ -5,257 +5,257 @@
   <title>Inventory Website</title>
   <style>
     body {
-    margin: 0;
-    font-family: 'Times New Roman', Times, serif, sans-serif;
-    }
-    .search {
-      color: #666;
-      border-top: 0 none;
-      overflow: hidden;
-      margin: 0;
-      padding: 4px 6px 0 4px;
-      position: absolute;
-      top: 51px;
-      right: 50px;
-      z-index: 99;
-      white-space: normal;
-    }
-    .search.left {
-      border-left: 0 none;
-      border-radius: 0px 0px 5px 0px;
-      left: 0;
-    }
-    .search.right {
-      border-radius: 0px 0px 0px 5px;
-      border-right: 0 none;
-      right: 0;
-    }
-    .search_form {
-      margin: 0 20px 4px 0;
-      overflow: hidden;
-      line-height: 1.9;
-      outline: 1px solid blue;
-    }
-    .search_field {
-      border-radius: 3px 0 0 3px;
-      background-color: white;
-      color: black;
-      border: 1px solid #cbcbcb;
-      border-right: 0 none;
-      outline: 0;
-      font-size: inherit;
-      margin: 0;
-      line-height: inherit;
-      padding: 0 6px;
-      min-width: 17em;
-      vertical-align: top;
-      min-height: 1.8em;
-      box-sizing: content-box;
-    }
-    .searchbtn {
-      border: 1px solid #cbcbcb;
-      line-height: inherit;
-      display: inline-block;
-      padding: 0 6px;
-      background: #fff;
-      border-right: 0 none;
-      border-left: 1px solid #dcdcdc;
-      cursor: pointer;
-      margin: 0;
-      position: relative;
-      color: #666;
-    }
-    .searchbtn:last-child {
-      border-radius: 0 3px 3px 0;
-      border-right: 1px solid #cbcbcb;
-    }
-    .searchbtn:disabled {
-      background: none;
-      cursor: default;
-    }
-    .searchbtn:hover {
-      background-color: #eef1f6;
-    }
-    .searchbtn.prev,
-    .searchbtn.next {
-      padding: 0px 0.7em;
-    }
-    .searchbtn.prev:after,
-    .searchbtn.next:after {
-      content: "";
-      border: solid 2px #888;
-      width: 0.5em;
-      height: 0.5em;
-      border-width: 2px 0 0 2px;
-      display: inline-block;
-      transform: rotate(-45deg);
-    }
-    .searchbtn.next:after {
-      border-width: 0 2px 2px 0;
-    }
-    .folder-bar {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      background-color: #f1f1f1;
-      border-bottom: 2px solid #eee;
-      display: flex;
-      padding: 0 10px;
-      z-index: 1000;
-    }
-    .folder-tab {
-      background-color: #e0e0e0;
-      padding: 10px 20px;
-      margin: 10px 5px 0 0;
-      border: 1px solid #ccc;
-      border-bottom: none;
-      border-top-left-radius: 5px;
-      border-top-right-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .folder-tab:hover {
-      background-color: #d5d5d5;
-    }
-    .folder-tab.active {
-      background-color: white;
-      font-weight: bold;
-      border-bottom: 2px solid white;
-    }
-    .content {
-      padding: 80px 20px 20px;
-    }
-    .folder-content,
-    .nested-content {
-      display: none;
-    }
-    .folder-content.active,
-    .nested-content.active {
-      display: block;
-    }
-    .nested-bar {
-      margin-top: 10px;
-      border-bottom: 1px solid #ccc;
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-      position: sticky;
-      top: 80px; /* keeps it visible under top bar */
-      background: #fff;
-      z-index: 10;
-      padding: 5px 0;
-    }
-    
-    .nested-tab {
-      background-color: #ddd;
-      padding: 6px 15px;
-      border: 1px solid #bbb;
-      border-radius: 3px 3px 0 0;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    
-    .nested-tab:hover {
-      background-color: #ccc;
-    }
-    
-    .nested-tab.active {
-      background-color: #fff;
-      font-weight: bold;
-      border-bottom: 2px solid #5771a9;
-    }
-    
-    .nested-content {
-      border: 1px solid #ccc;
-      border-top: none;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 0 0 4px 4px;
-      background: #fafafa;
-      display: block; /* Always visible (stacked) */
-    }
-    
-    .nested-content.highlighted {
-      border: 2px solid #5771a9;
-      background: #ffffff;
-      scroll-margin-top: 120px;
-    }
-    .counter {
-      margin-top: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .counter input[type="number"] {
-      width: 80px;
-      padding: 5px;
-      font-size: 16px;
-      text-align: center;
-    }
-    .counter button {
-      padding: 5px 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .add-folder {
-      margin-top: 10px;
-      display: inline-block;
-      padding: 5px 10px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    .add-folder:hover {
-      background-color: #45a049;
-    }
-    .delete-folder {
-      margin-top: 10px;
-      background-color: #e53935;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    .delete-folder:hover {
-      background-color: #d32f2f;
-    }
-    .readonly-list {
-      padding: 10px;
-      font-family: monospace;
-      white-space: pre;
-    }
-    .all-btn {
-      margin-top: 10px;
-      display: inline-block;
-      padding: 5px 10px;
-      background-color: #5771a9;
-      color: white;
-      font-size: large;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    .all-btn:hover {
-      background-color: #45a049;
-    }
-    #allfoldersList {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    #allfoldersList td {
-      padding: 6px 10px;
-      border-bottom: 1px solid #ccc;
-    }
-    .nav-brand {
-      margin-top: 65px;
-      left: 5px;
-    }
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif, sans-serif;
+}
+.search {
+  color: #666;
+  border-top: 0 none;
+  overflow: hidden;
+  margin: 0;
+  padding: 4px 6px 0 4px;
+  position: sticky;
+  top: 51px;
+  right: 50px;
+  z-index: 99;
+  white-space: normal;
+  float: right;
+}
+.search.left {
+  border-left: 0 none;
+  border-radius: 0px 0px 5px 0px;
+  left: 0;
+}
+.search.right {
+  border-radius: 0px 0px 0px 5px;
+  border-right: 0 none;
+  right: 0;
+}
+.search_form {
+  margin: 0 20px 4px 0;
+  overflow: hidden;
+  line-height: 1.9;
+  outline: 1px solid blue;
+}
+.search_field {
+  border-radius: 3px 0 0 3px;
+  background-color: white;
+  color: black;
+  border: 1px solid #cbcbcb;
+  border-right: 0 none;
+  outline: 0;
+  font-size: inherit;
+  margin: 0;
+  line-height: inherit;
+  padding: 0 6px;
+  min-width: 17em;
+  vertical-align: top;
+  min-height: 1.8em;
+  box-sizing: content-box;
+}
+.searchbtn {
+  border: 1px solid #cbcbcb;
+  line-height: inherit;
+  display: inline-block;
+  padding: 0 6px;
+  background: #fff;
+  border-right: 0 none;
+  border-left: 1px solid #dcdcdc;
+  cursor: pointer;
+  margin: 0;
+  position: relative;
+  color: #666;
+}
+.searchbtn:last-child {
+  border-radius: 0 3px 3px 0;
+  border-right: 1px solid #cbcbcb;
+}
+.searchbtn:disabled {
+  background: none;
+  cursor: default;
+}
+.searchbtn:hover {
+  background-color: #eef1f6;
+}
+.searchbtn.prev,
+.searchbtn.next {
+  padding: 0px 0.7em;
+}
+.searchbtn.prev:after,
+.searchbtn.next:after {
+  content: "";
+  border: solid 2px #888;
+  width: 0.5em;
+  height: 0.5em;
+  border-width: 2px 0 0 2px;
+  display: inline-block;
+  transform: rotate(-45deg);
+}
+.searchbtn.next:after {
+  border-width: 0 2px 2px 0;
+}
+.folder-bar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #f1f1f1;
+  border-bottom: 2px solid #eee;
+  display: flex;
+  padding: 0 10px;
+  z-index: 1000;
+}
+.folder-tab {
+  background-color: #e0e0e0;
+  padding: 10px 20px;
+  margin: 10px 5px 0 0;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.folder-tab:hover {
+  background-color: #d5d5d5;
+}
+.folder-tab.active {
+  background-color: white;
+  font-weight: bold;
+  border-bottom: 2px solid white;
+}
+.content {
+  padding: 80px 20px 20px;
+}
+.folder-content,
+.nested-content {
+  display: none;
+}
+.folder-content.active,
+.nested-content.active {
+  display: block;
+}
+.nested-bar {
+  margin-top: 10px;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 51px; /* keeps it visible under top bar */
+  background: #fff;
+  z-index: 10;
+  padding-top: 35px;
+}
 
+.nested-tab {
+  background-color: #ddd;
+  padding: 6px 15px;
+  border: 1px solid #bbb;
+  border-radius: 3px 3px 0 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.nested-tab:hover {
+  background-color: #ccc;
+}
+
+.nested-tab.active {
+  background-color: #fff;
+  font-weight: bold;
+  border-bottom: 2px solid #5771a9;
+}
+
+.nested-content {
+  border: 1px solid #ccc;
+  border-top: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 0 0 4px 4px;
+  background: #fafafa;
+  display: block; /* Always visible (stacked) */
+}
+
+.nested-content.highlighted {
+  border: 2px solid #5771a9;
+  background: #ffffff;
+  scroll-margin-top: 120px;
+}
+.counter {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.counter input[type="number"] {
+  width: 80px;
+  padding: 5px;
+  font-size: 16px;
+  text-align: center;
+}
+.counter button {
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.add-folder {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.add-folder:hover {
+  background-color: #45a049;
+}
+.delete-folder {
+  margin-top: 10px;
+  background-color: #e53935;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.delete-folder:hover {
+  background-color: #d32f2f;
+}
+.readonly-list {
+  padding: 10px;
+  font-family: monospace;
+  white-space: pre;
+}
+.all-btn {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #5771a9;
+  color: white;
+  font-size: large;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.all-btn:hover {
+  background-color: #45a049;
+}
+#allfoldersList {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+#allfoldersList td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #ccc;
+}
+.nav-brand {
+  margin-top: 65px;
+  left: 5px;
+}
   </style>
 </head>
 <body>
@@ -305,7 +305,7 @@
   </div>
 
   <script>
- const lastActiveNestedTab = {}
+const lastActiveNestedTab = {}
 let folderCount = 0
 
 const topTabs = document.querySelectorAll('.folder-tab')
@@ -386,7 +386,7 @@ function setupDeleteButtons(folderEl) {
       const tab = folderEl.querySelector(`.nested-tab[data-nested="${tabId}"]`)
       const content = folderEl.querySelector(`#${tabId}`)
       const isActive = tab.classList.contains('active')
-      if (confirm('Delete folder?')) {
+      if (confirm('Delete Item?')) {
         tab?.remove()
         content?.remove()
       }
@@ -442,7 +442,7 @@ document.querySelectorAll('.add-folder').forEach((button) => {
         <button data-change="1">+1</button>
         <button data-change="10">+10</button>
       </div>
-      <button class="delete-folder" data-tab="${tabId}">Delete folder</button>
+      <button class="delete-folder" data-tab="${tabId}">Delete Item</button>
     `
 
     //alphabetical order
@@ -523,10 +523,12 @@ const searchInput = document.querySelector('.search_field')
 const prevBtn = document.querySelector('.searchbtn.prev')
 const nextBtn = document.querySelector('.searchbtn.next')
 const counter = document.querySelector('.search_counter')
+const container = document.querySelector('.folder-content')
 
 function clearHighlights() {
   document.querySelectorAll('.highlight').forEach((el) => {
-    el.outerHTML = el.innerText
+    const textNode = document.createTextNode(el.textContent)
+    el.parentNode.replaceChild(textNode, el)
   })
 }
 
@@ -534,47 +536,46 @@ function highlightText(text) {
   clearHighlights()
   if (!text.trim()) {
     searchResults = []
-    counter.textContent = ''
+    currentIndex = -1
+    counter.textContent = '0 of 0'
     return
   }
-  const walker = document.createTreeWalker(
-    document.body,
-    NodeFilter.SHOW_TEXT,
-    null,
-    false,
-  )
-  searchResults = []
+  
+  // Escape special regex characters
+  const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(`(${escapedText})`, 'gi')
+  
+  const nodesToReplace = []
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
+  
   while (walker.nextNode()) {
     const node = walker.currentNode
     const val = node.nodeValue
-    const idx = val.toLowerCase().indexOf(text.toLowerCase())
-    if (idx !== -1 && node.parentElement.closest('.folder-content')) {
-      const span = document.createElement('span')
-      span.innerHTML =
-        val.substring(0, idx) +
-        `<mark class="highlight" style="background:yellow">${val.substring(idx, idx + text.length)}</mark>` +
-        val.substring(idx + text.length)
-      node.parentNode.replaceChild(span, node)
+    if (regex.test(val)) {
+      nodesToReplace.push(node)
     }
   }
+  
+  // Replace nodes after collection
+  nodesToReplace.forEach(node => {
+    const span = document.createElement('span')
+    span.innerHTML = node.nodeValue.replace(regex, `<mark class="highlight" style="background:yellow">$1</mark>`)
+    node.parentNode.replaceChild(span, node)
+  })
+  
   searchResults = Array.from(document.querySelectorAll('.highlight'))
-  if (searchResults.length) {
+  if (searchResults.length > 0) {
     currentIndex = 0
     scrollToResult()
+  } else {
+    counter.textContent = '0 of 0'
   }
-  counter.textContent = searchResults.length
-    ? `${currentIndex + 1} of ${searchResults.length}`
-    : '0 of 0'
 }
-
 function scrollToResult() {
   searchResults.forEach((el, i) => {
     el.style.background = i === currentIndex ? 'orange' : 'yellow'
   })
-  searchResults[currentIndex]?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'center',
-  })
+  searchResults[currentIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   counter.textContent = `${currentIndex + 1} of ${searchResults.length}`
 }
 
@@ -586,14 +587,12 @@ nextBtn.addEventListener('click', () => {
 
 prevBtn.addEventListener('click', () => {
   if (searchResults.length === 0) return
-  currentIndex =
-    (currentIndex - 1 + searchResults.length) % searchResults.length
+  currentIndex = (currentIndex - 1 + searchResults.length) % searchResults.length
   scrollToResult()
 })
 
-searchInput.addEventListener('input', (e) => {
-  highlightText(e.target.value)
-})
+searchInput.addEventListener('input', (e) => highlightText(e.target.value))
+
 // Search end
 // import and export functions
 
@@ -706,7 +705,7 @@ function restoreFolderData(data) {
           <button data-change="1">+1</button>
           <button data-change="10">+10</button>
         </div>
-        <button class="delete-folder" data-tab="${tabId}">Delete folder</button>
+        <button class="delete-folder" data-tab="${tabId}">Delete Item</button>
       `
 
       // Insert alphabetically
@@ -746,7 +745,6 @@ document.getElementById('importAllInput').addEventListener('change', (e) => {
 })
 // import/export end
 updateAllView()
-
 </script>
 
 </body>
