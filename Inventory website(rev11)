@@ -615,52 +615,78 @@
   }
   
   function restoreFolderData(data) {
-    Object.entries(data).forEach(([folderId, subfolders]) => {
-      const folder = document.querySelector(`.folder-content[data-folder-id="${folderId}"]`);
-      if (!folder) return;
-      const nestedBar = folder.querySelector('.nested-bar');
-  
-      // Clear current subfolders
-      nestedBar.innerHTML = '';
-      folder.querySelectorAll('.nested-content').forEach(c => c.remove());
-  
-      subfolders.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
-  
-      subfolders.forEach(sub => {
-        const tabId = `${folderId}-sf${++folderCount}`;
-  
-        const tab = document.createElement('div');
-        tab.className = 'nested-tab';
-        tab.dataset.nested = tabId;
-        tab.textContent = sub.name;
-  
-        const content = document.createElement('div');
-        content.className = 'nested-content';
-        content.id = tabId;
-        content.innerHTML = `
-          <h2>${folderId}/${sub.name}</h2>
-          <div class="counter">
-            <label>Counter:</label>
-            <button data-change="-10">-10</button>
-            <button data-change="-1">-1</button>
-            <input type="number" value="${sub.count}" min="0">
-            <button data-change="1">+1</button>
-            <button data-change="10">+10</button>
-          </div>
-          <button class="delete-folder" data-tab="${tabId}">Delete folder</button>
-        `;
-  
+  Object.entries(data).forEach(([folderId, subfolders]) => {
+    const folder = document.querySelector(`.folder-content[data-folder-id="${folderId}"]`);
+    if (!folder) return;
+    const nestedBar = folder.querySelector('.nested-bar');
+
+    // Read existing subfolders into a Map for quick lookup
+    const existingTabs = Array.from(nestedBar.querySelectorAll('.nested-tab'));
+    const existingMap = new Map(
+      existingTabs.map(tab => [tab.textContent.toLowerCase(), tab.dataset.nested])
+    );
+
+    subfolders.forEach(sub => {
+      const subName = sub.name.trim();
+      const lower = subName.toLowerCase();
+
+      // If it already exists, just update the counter
+      if (existingMap.has(lower)) {
+        const existingId = existingMap.get(lower);
+        const existingContent = folder.querySelector(`#${existingId}`);
+        const input = existingContent.querySelector('input[type="number"]');
+        input.value = sub.count;
+        return;
+      }
+
+      // Otherwise, create a brand new subfolder
+      const tabId = `${folderId}-sf${++folderCount}`;
+      const tab = document.createElement('div');
+      tab.className = 'nested-tab';
+      tab.dataset.nested = tabId;
+      tab.textContent = subName;
+
+      const content = document.createElement('div');
+      content.className = 'nested-content';
+      content.id = tabId;
+      content.innerHTML = `
+        <h2>${folderId}/${subName}</h2>
+        <div class="counter">
+          <label>Counter:</label>
+          <button data-change="-10">-10</button>
+          <button data-change="-1">-1</button>
+          <input type="number" value="${sub.count}" min="0">
+          <button data-change="1">+1</button>
+          <button data-change="10">+10</button>
+        </div>
+        <button class="delete-folder" data-tab="${tabId}">Delete folder</button>
+      `;
+
+      // Insert alphabetically
+      const existing = Array.from(nestedBar.querySelectorAll('.nested-tab'));
+      let inserted = false;
+      for (const existingTab of existing) {
+        if (existingTab.textContent.toLowerCase() > subName.toLowerCase()) {
+          nestedBar.insertBefore(tab, existingTab);
+          const existingContent = folder.querySelector(`#${existingTab.dataset.nested}`);
+          folder.insertBefore(content, existingContent);
+          inserted = true;
+          break;
+        }
+      }
+      if (!inserted) {
         nestedBar.appendChild(tab);
         folder.appendChild(content);
-  
-        setupCounterLogic(content);
-      });
-  
-      setupNestedTabLogic(folder);
-      setupDeleteButtons(folder);
+      }
+
+      setupCounterLogic(content);
     });
-  
-    updateAllView();
+
+    setupNestedTabLogic(folder);
+    setupDeleteButtons(folder);
+  });
+
+  updateAllView();
   }
   
   // Hook up event listeners
