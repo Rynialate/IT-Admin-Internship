@@ -411,7 +411,6 @@ function setupDeleteButtons(folderEl) {
       setupNestedTabLogic(folderEl)
       setupDeleteButtons(folderEl)
       updateAllView()
-      storeOriginalHTML() // Update stored HTML after deletion
     })
   })
 }
@@ -490,8 +489,6 @@ document.querySelectorAll('.add-folder').forEach((button) => {
     setupNestedTabLogic(folderContent)
     setupDeleteButtons(folderContent)
     updateAllView()
-    storeOriginalHTML() // Update stored HTML after adding new folder
-
     const folderEl = folderContent.getAttribute('data-folder-id')
     lastActiveNestedTab[folderEl] = tabId
     content.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -569,6 +566,7 @@ function setupContainerEventListeners(container) {
 //makes highlights only in the currently active folder content
 function highlightText(text) {
   clearHighlights()
+  storeOriginalHTML()
   if (!text.trim()) {
     searchResults = []
     currentIndex = -1
@@ -792,7 +790,6 @@ function restoreFolderData(data) {
   })
 
   updateAllView()
-  storeOriginalHTML() // Update stored HTML after import
 }
 
 // Hook up event listeners
