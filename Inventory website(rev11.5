@@ -526,16 +526,20 @@ const prevBtn = document.querySelector('.searchbtn.prev')
 const nextBtn = document.querySelector('.searchbtn.next')
 const counter = document.querySelector('.search_counter')
 const container = document.querySelector('.folder-content')
+
 // clears highlights 
 function clearHighlights() {
   document.querySelectorAll('.highlight').forEach((el) => {
     const textNode = document.createTextNode(el.textContent)
     el.parentNode.replaceChild(textNode, el)
   })
+
 }
 //makes highlights 
 function highlightText(text) {
   clearHighlights()
+  const originalHTML = container.innerHTML
+  container.innerHTML = originalHTML // Restore original HTML
   if (!text.trim()) {
     searchResults = []
     currentIndex = -1
@@ -545,24 +549,24 @@ function highlightText(text) {
   
   // Escape special regex characters
   const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const regex = new RegExp(`(${escapedText})`, 'gi')
+  const regex = new RegExp( `(${escapedText})`, 'gi' )
   
   const nodesToReplace = []
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
   
   while (walker.nextNode()) {
     const node = walker.currentNode
-    const val = node.nodeValue
-    if (regex.test(val)) {
-      nodesToReplace.push(node)
-    }
+    nodesToReplace.push(node)
   }
   
   // Replace nodes after collection
   nodesToReplace.forEach(node => {
-    const span = document.createElement('span')
-    span.innerHTML = node.nodeValue.replace(regex, `<mark class="highlight" style="background:yellow">$1</mark>`)
-    node.parentNode.replaceChild(span, node)
+    const newHTML = node.nodeValue.replace(regex, `<mark class="highlight" style="background:yellow">$1</mark>`)
+    if (newHTML !== node.nodeValue) {  // Only replace if there was a match
+      const span = document.createElement('span')
+      span.innerHTML = newHTML
+      node.parentNode.replaceChild(span, node)
+    }
   })
   // updating the displayed amount of finds
   searchResults = Array.from(document.querySelectorAll('.highlight'))
@@ -712,7 +716,7 @@ function restoreFolderData(data) {
         <button class="delete-folder" data-tab="${tabId}">Delete Item</button>
       `
 
-      // alphabetically insert 
+      // alphabetically insert
       const existing = Array.from(nestedBar.querySelectorAll('.nested-tab'))
       let inserted = false
       for (const existingTab of existing) {
@@ -747,6 +751,7 @@ document.getElementById('importAllInput').addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (file) importAllData(file)
 })
+// import/export end
 updateAllView()
 </script>
 
