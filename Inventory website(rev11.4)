@@ -307,7 +307,7 @@
   <script>
 const lastActiveNestedTab = {}
 let folderCount = 0
-
+// start of the top tab bar click logic
 const topTabs = document.querySelectorAll('.folder-tab')
 const topContents = document.querySelectorAll('.folder-content')
 
@@ -341,7 +341,7 @@ topTabs.forEach((tab) => {
     }
   })
 })
-
+//start of nested bar click/scroll logic
 function setupNestedTabLogic(folderEl) {
   const tabs = folderEl.querySelectorAll('.nested-tab')
   const contents = folderEl.querySelectorAll('.nested-content')
@@ -362,7 +362,7 @@ function setupNestedTabLogic(folderEl) {
     })
   })
 }
-
+// counter buttons logic
 function setupCounterLogic(container) {
   const buttons = container.querySelectorAll('button[data-change]')
   const input = container.querySelector('input[type="number"]')
@@ -377,7 +377,7 @@ function setupCounterLogic(container) {
     })
   })
 }
-
+// delete item logic 
 function setupDeleteButtons(folderEl) {
   const folderId = folderEl.getAttribute('data-folder-id')
   folderEl.querySelectorAll('.delete-folder').forEach((button) => {
@@ -408,7 +408,8 @@ function setupDeleteButtons(folderEl) {
     })
   })
 }
-
+// add folder logic 
+// the reason that the import/export didnt work
 document.querySelectorAll('.add-folder').forEach((button) => {
   button.addEventListener('click', () => {
     const folderContent = button.closest('.folder-content')
@@ -416,6 +417,7 @@ document.querySelectorAll('.add-folder').forEach((button) => {
     const nestedBar = folderContent.querySelector('.nested-bar')
     const name = prompt('Enter folder name:')
     if (!name) return
+// 32 character limit 
     if (name.length > 32) {
       alert('Folder name must be under 32 characters.')
       return
@@ -423,7 +425,7 @@ document.querySelectorAll('.add-folder').forEach((button) => {
 
     const tabId = `${folderId}-sf${++folderCount}`
 
-    // Create the tab and content elements
+// Create the tab and content elements
     const tab = document.createElement('div')
     tab.className = 'nested-tab'
     tab.dataset.nested = tabId
@@ -445,7 +447,7 @@ document.querySelectorAll('.add-folder').forEach((button) => {
       <button class="delete-folder" data-tab="${tabId}">Delete Item</button>
     `
 
-    //alphabetical order
+    //alphabetical sorting at inserion
     const existingTabs = Array.from(nestedBar.querySelectorAll('.nested-tab'))
     let inserted = false
     for (const existing of existingTabs) {
@@ -461,13 +463,13 @@ document.querySelectorAll('.add-folder').forEach((button) => {
       }
     }
 
-    // If name at the end
+    // if it happens to be at the end 
     if (!inserted) {
       nestedBar.appendChild(tab)
       folderContent.appendChild(content)
     }
 
-    // Activate visually
+    //activate the tab on creation
     folderContent
       .querySelectorAll('.nested-tab')
       .forEach((t) => t.classList.remove('active'))
@@ -487,7 +489,7 @@ document.querySelectorAll('.add-folder').forEach((button) => {
     content.scrollIntoView({ behavior: 'smooth', block: 'center' })
   })
 })
-
+// updating the full list of things 
 function updateAllView() {
   const list = document.getElementById('allfoldersList')
   list.innerHTML = ''
@@ -515,7 +517,7 @@ function updateAllView() {
   })
 }
 
-// Search
+// Search function
 let searchResults = []
 let currentIndex = -1
 
@@ -524,14 +526,14 @@ const prevBtn = document.querySelector('.searchbtn.prev')
 const nextBtn = document.querySelector('.searchbtn.next')
 const counter = document.querySelector('.search_counter')
 const container = document.querySelector('.folder-content')
-
+// clears highlights 
 function clearHighlights() {
   document.querySelectorAll('.highlight').forEach((el) => {
     const textNode = document.createTextNode(el.textContent)
     el.parentNode.replaceChild(textNode, el)
   })
 }
-
+//makes highlights 
 function highlightText(text) {
   clearHighlights()
   if (!text.trim()) {
@@ -562,7 +564,7 @@ function highlightText(text) {
     span.innerHTML = node.nodeValue.replace(regex, `<mark class="highlight" style="background:yellow">$1</mark>`)
     node.parentNode.replaceChild(span, node)
   })
-  
+  // updating the displayed amount of finds
   searchResults = Array.from(document.querySelectorAll('.highlight'))
   if (searchResults.length > 0) {
     currentIndex = 0
@@ -571,6 +573,7 @@ function highlightText(text) {
     counter.textContent = '0 of 0'
   }
 }
+// scroll function 
 function scrollToResult() {
   searchResults.forEach((el, i) => {
     el.style.background = i === currentIndex ? 'orange' : 'yellow'
@@ -578,13 +581,13 @@ function scrollToResult() {
   searchResults[currentIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   counter.textContent = `${currentIndex + 1} of ${searchResults.length}`
 }
-
+// next button on the search bar
 nextBtn.addEventListener('click', () => {
   if (searchResults.length === 0) return
   currentIndex = (currentIndex + 1) % searchResults.length
   scrollToResult()
 })
-
+// previous button search bar
 prevBtn.addEventListener('click', () => {
   if (searchResults.length === 0) return
   currentIndex = (currentIndex - 1 + searchResults.length) % searchResults.length
@@ -593,12 +596,12 @@ prevBtn.addEventListener('click', () => {
 
 searchInput.addEventListener('input', (e) => highlightText(e.target.value))
 
-// Search end
+
 // import and export functions
 
 function getAllFolderData() {
   const data = {}
-
+// grabbing all of the data
   document.querySelectorAll('.folder-content').forEach((folder) => {
     const folderId = folder.getAttribute('data-folder-id')
     if (folderId === 'folderAll') return
@@ -618,6 +621,7 @@ function getAllFolderData() {
 
   return data
 }
+//export function name is inventory weekday month date year 
 function exportAllData() {
   const data = getAllFolderData()
   if (!data) {
@@ -640,7 +644,7 @@ function exportAllData() {
 
   URL.revokeObjectURL(url)
 }
-
+// import function 
 function importAllData(file) {
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -663,7 +667,7 @@ function restoreFolderData(data) {
     if (!folder) return
     const nestedBar = folder.querySelector('.nested-bar')
 
-    // Read existing subfolders into a Map for quick lookup
+    //put subfolders into a map for quicker lookup 
     const existingTabs = Array.from(nestedBar.querySelectorAll('.nested-tab'))
     const existingMap = new Map(
       existingTabs.map((tab) => [
@@ -676,7 +680,7 @@ function restoreFolderData(data) {
       const subName = sub.name.trim()
       const lower = subName.toLowerCase()
 
-      // If it already exists, just update the counter
+      // if it exists add to the counter  - broken 
       if (existingMap.has(lower)) {
         const existingId = existingMap.get(lower)
         const existingContent = folder.querySelector(`#${existingId}`)
@@ -685,7 +689,7 @@ function restoreFolderData(data) {
         return
       }
 
-      // Otherwise, create a brand new subfolder
+      // else make new subfolder, his works 
       const tabId = `${folderId}-sf${++folderCount}`
       const tab = document.createElement('div')
       tab.className = 'nested-tab'
@@ -708,7 +712,7 @@ function restoreFolderData(data) {
         <button class="delete-folder" data-tab="${tabId}">Delete Item</button>
       `
 
-      // Insert alphabetically
+      // alphabetically insert 
       const existing = Array.from(nestedBar.querySelectorAll('.nested-tab'))
       let inserted = false
       for (const existingTab of existing) {
@@ -743,7 +747,6 @@ document.getElementById('importAllInput').addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (file) importAllData(file)
 })
-// import/export end
 updateAllView()
 </script>
 
