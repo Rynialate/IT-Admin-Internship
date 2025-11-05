@@ -304,7 +304,7 @@
     </div>
   </div>
 
-  <script>
+<script>
 const lastActiveNestedTab = {}
 let folderCount = 0
 // start of the top tab bar click logic
@@ -338,6 +338,12 @@ topTabs.forEach((tab) => {
           .querySelector(`#${activeNestedId}`)
           ?.classList.add('active')
       }
+    }
+    
+    // Re-run search function for the new active tab 
+    const searchInput = document.querySelector('.search_field')
+    if (searchInput && searchInput.value.trim()) {
+      highlightText(searchInput.value)
     }
   })
 })
@@ -405,6 +411,7 @@ function setupDeleteButtons(folderEl) {
       setupNestedTabLogic(folderEl)
       setupDeleteButtons(folderEl)
       updateAllView()
+      storeOriginalHTML() // Update stored HTML after deletion
     })
   })
 }
@@ -483,6 +490,7 @@ document.querySelectorAll('.add-folder').forEach((button) => {
     setupNestedTabLogic(folderContent)
     setupDeleteButtons(folderContent)
     updateAllView()
+    storeOriginalHTML() // Update stored HTML after adding new folder
 
     const folderEl = folderContent.getAttribute('data-folder-id')
     lastActiveNestedTab[folderEl] = tabId
@@ -517,30 +525,60 @@ function updateAllView() {
   })
 }
 
-// Search function
+// Search function, searches only the active super tab
 let searchResults = []
 let currentIndex = -1
+let originalHTML = new Map() // Store original HTML for each container
 
 const searchInput = document.querySelector('.search_field')
 const prevBtn = document.querySelector('.searchbtn.prev')
 const nextBtn = document.querySelector('.searchbtn.next')
 const counter = document.querySelector('.search_counter')
-const container = document.querySelector('.folder-content')
 
-// clears highlights 
-function clearHighlights() {
-  document.querySelectorAll('.highlight').forEach((el) => {
-    const textNode = document.createTextNode(el.textContent)
-    el.parentNode.replaceChild(textNode, el)
+// Store original HTML for all folder contents
+function storeOriginalHTML() {
+  document.querySelectorAll('.folder-content').forEach(container => {
+    if (!originalHTML.has(container)) {
+      originalHTML.set(container, container.innerHTML)
+    }
   })
-
 }
-//makes highlights 
+
+// clears highlights and restores original HTML
+function clearHighlights() {
+  const activeContainer = document.querySelector('.folder-content.active')
+  if (activeContainer && originalHTML.has(activeContainer)) {
+    activeContainer.innerHTML = originalHTML.get(activeContainer)
+    // Re-setup event listeners after restoring HTML
+    setupContainerEventListeners(activeContainer)
+  }
+}
+
+// Re-setup event listeners for a container after HTML restoration
+function setupContainerEventListeners(container) {
+  const folderId = container.getAttribute('data-folder-id')
+  if (folderId && folderId !== 'folderAll') {
+    setupNestedTabLogic(container)
+    setupDeleteButtons(container)
+    container.querySelectorAll('.nested-content').forEach(content => {
+      setupCounterLogic(content)
+    })
+  }
+}
+
+//makes highlights only in the currently active folder content
 function highlightText(text) {
   clearHighlights()
-  const originalHTML = container.innerHTML
-  container.innerHTML = originalHTML // Restore original HTML
   if (!text.trim()) {
+    searchResults = []
+    currentIndex = -1
+    counter.textContent = '0 of 0'
+    return
+  }
+  
+  // Get the currently active folder content
+  const activeContainer = document.querySelector('.folder-content.active')
+  if (!activeContainer) {
     searchResults = []
     currentIndex = -1
     counter.textContent = '0 of 0'
@@ -549,10 +587,11 @@ function highlightText(text) {
   
   // Escape special regex characters
   const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const regex = new RegExp( `(${escapedText})`, 'gi' )
+  const regex = new RegExp(`(${escapedText})`, 'gi')
   
+  // Search only within the active folder content
   const nodesToReplace = []
-  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
+  const walker = document.createTreeWalker(activeContainer, NodeFilter.SHOW_TEXT)
   
   while (walker.nextNode()) {
     const node = walker.currentNode
@@ -568,6 +607,7 @@ function highlightText(text) {
       node.parentNode.replaceChild(span, node)
     }
   })
+  
   // updating the displayed amount of finds
   searchResults = Array.from(document.querySelectorAll('.highlight'))
   if (searchResults.length > 0) {
@@ -577,20 +617,29 @@ function highlightText(text) {
     counter.textContent = '0 of 0'
   }
 }
-// scroll function 
+
+// scroll function
 function scrollToResult() {
   searchResults.forEach((el, i) => {
     el.style.background = i === currentIndex ? 'orange' : 'yellow'
   })
-  searchResults[currentIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  
+  const currentResult = searchResults[currentIndex]
+  if (currentResult) {
+    // Scroll to the result
+    currentResult.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+  
   counter.textContent = `${currentIndex + 1} of ${searchResults.length}`
 }
+
 // next button on the search bar
 nextBtn.addEventListener('click', () => {
   if (searchResults.length === 0) return
   currentIndex = (currentIndex + 1) % searchResults.length
   scrollToResult()
 })
+
 // previous button search bar
 prevBtn.addEventListener('click', () => {
   if (searchResults.length === 0) return
@@ -689,11 +738,11 @@ function restoreFolderData(data) {
         const existingId = existingMap.get(lower)
         const existingContent = folder.querySelector(`#${existingId}`)
         const input = existingContent.querySelector('input[type="number"]')
-        input.value = sub.count
+        input.value = sub.count 
         return
       }
 
-      // else make new subfolder, his works 
+      // else make new subfolder, this works 
       const tabId = `${folderId}-sf${++folderCount}`
       const tab = document.createElement('div')
       tab.className = 'nested-tab'
@@ -743,6 +792,7 @@ function restoreFolderData(data) {
   })
 
   updateAllView()
+  storeOriginalHTML() // Update stored HTML after import
 }
 
 // Hook up event listeners
@@ -752,6 +802,8 @@ document.getElementById('importAllInput').addEventListener('change', (e) => {
   if (file) importAllData(file)
 })
 // import/export end
+
+// Initialize
 updateAllView()
 </script>
 
