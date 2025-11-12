@@ -545,28 +545,30 @@ function storeOriginalHTML() {
 function clearHighlights() {
   const activeContainer = document.querySelector('.folder-content.active')
   if (activeContainer && originalHTML.has(activeContainer)) {
-    activeContainer.innerHTML = originalHTML.get(activeContainer)
-    // Re-setup event listeners after restoring HTML
-    setupContainerEventListeners(activeContainer)
+    // Only restore if this container was actually searched (not folderAll)
+    const folderId = activeContainer.getAttribute('data-folder-id')
+    if (folderId !== 'folderAll') {
+      activeContainer.innerHTML = originalHTML.get(activeContainer)
+      // Re-setup event listeners after restoring HTML
+      setupContainerEventListeners(activeContainer)
+    }
   }
 }
 
 // Re-setup event listeners for a container after HTML restoration
 function setupContainerEventListeners(container) {
   const folderId = container.getAttribute('data-folder-id')
-  if (folderId && folderId !== 'folderAll') {
     setupNestedTabLogic(container)
     setupDeleteButtons(container)
     container.querySelectorAll('.nested-content').forEach(content => {
       setupCounterLogic(content)
     })
-  }
 }
 
 //makes highlights only in the currently active folder content
 function highlightText(text) {
   clearHighlights()
-  storeOriginalHTML()
+  
   if (!text.trim()) {
     searchResults = []
     currentIndex = -1
@@ -583,6 +585,18 @@ function highlightText(text) {
     return
   }
   
+  // Check if the active folder is 'folderAll' and skip search
+  const folderId = activeContainer.getAttribute('data-folder-id')
+  if (folderId === 'folderAll') {
+    searchResults = []
+    currentIndex = -1
+    counter.textContent = '0 of 0'
+    return
+  }
+  
+  // Store original HTML before making any changes
+  storeOriginalHTML()
+  
   // Escape special regex characters
   const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const regex = new RegExp(`(${escapedText})`, 'gi')
@@ -590,7 +604,6 @@ function highlightText(text) {
   // Search only within the active folder content
   const nodesToReplace = []
   const walker = document.createTreeWalker(activeContainer, NodeFilter.SHOW_TEXT)
-  
   while (walker.nextNode()) {
     const node = walker.currentNode
     nodesToReplace.push(node)
@@ -646,8 +659,6 @@ prevBtn.addEventListener('click', () => {
 })
 
 searchInput.addEventListener('input', (e) => highlightText(e.target.value))
-
-
 // import and export functions
 
 function getAllFolderData() {
