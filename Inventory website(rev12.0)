@@ -737,6 +737,23 @@ function exportAllData() {
 
   URL.revokeObjectURL(url)
 }
+//update server side
+async function serverAllData() {
+  const data = getAllFolderData();
+
+  const res = await fetch("/api/inventory", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    alert("Saved to server!");
+  } else {
+    alert("Failed to save.");
+  }
+}
+
 // import function
 function importAllData(file) {
   const reader = new FileReader()
@@ -842,7 +859,20 @@ document.getElementById('importAllInput').addEventListener('change', (e) => {
 })
 // import/export end
 
-// Initialize
+// Initialize from server side
+async function loadFromServer() {
+  try {
+    const res = await fetch("/api/inventory");
+    if (!res.ok) return;
+
+    const data = await res.json();
+    restoreFolderData(data);
+  } catch (e) {
+    console.error("Could not load initial data");
+  }
+}
+
+loadFromServer();
 updateAllView()
 </script>
 
