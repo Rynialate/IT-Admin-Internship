@@ -243,6 +243,17 @@
 .all-btn:hover {
   background-color: #45a049;
 }
+.serv-btn {
+  margin-top: 10px;
+  display: block;
+  padding: 5px 10px;
+  background-color: #5771a9;
+  color: white;
+  font-size: large;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
 #allfoldersList {
   width: 100%;
   border-collapse: collapse;
@@ -296,7 +307,10 @@
       <input type="file" id="importAllInput" accept=".json" style="display:none;">
     </label>
       <button id="exportAllBtn" class="all-btn" style="background:#2196f3;"> Export </button>
-
+	 </div>
+	 <div>
+	  <button id="serverLoadBtn" class="serv-btn" style="background:#ff9800;"> Import From Server </button>
+	  <button id="serverAllBtn" class="serv-btn" style="background:#2196f3;"> Export To Server </button>
   </div>
 
 
@@ -790,7 +804,7 @@ function restoreFolderData(data) {
       const subName = sub.name.trim()
       const lower = subName.toLowerCase()
 
-      // if it exists add to the counter  - broken
+      // if it exists overwrite, if not add it  
       if (existingMap.has(lower)) {
         const existingId = existingMap.get(lower)
         const existingContent = folder.querySelector(`#${existingId}`)
@@ -853,11 +867,12 @@ function restoreFolderData(data) {
 
 // Hook up event listeners
 document.getElementById('exportAllBtn').addEventListener('click', exportAllData)
+document.getElementById('serverAllBtn').addEventListener('click', serverAllData)
+document.getElementById('serverLoadBtn').addEventListener('click', loadFromServer)
 document.getElementById('importAllInput').addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (file) importAllData(file)
 })
-// import/export end
 
 // Initialize from server side
 async function loadFromServer() {
@@ -871,8 +886,6 @@ async function loadFromServer() {
     console.error("Could not load initial data");
   }
 }
-
-loadFromServer();
 updateAllView()
 </script>
 
