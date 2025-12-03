@@ -4,7 +4,7 @@ all of the projects that i worked on in the internship that i felt worthy enough
 
 
 inventory website notes:
-requires apache2
+requires node.js
 file structure:
 RP's_inventory [
 data {inventory.json}
