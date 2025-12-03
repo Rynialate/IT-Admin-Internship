@@ -1,0 +1,12 @@
+inventory website notes:
+requires node.js
+file structure:
+RP's_inventory [
+data {inventory.json}
+node_modules{(use the 'npm install node-modules' command )}
+public {index.html}
+server.js
+]
+to start:
+open cmd in .../.../RP's_inventory
+run: 'node server.js'
